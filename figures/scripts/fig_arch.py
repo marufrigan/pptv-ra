@@ -1,0 +1,65 @@
+from vstyle import *
+
+fig, ax = canvas(6.3, 4.3)
+# ---------- row A: participants ----------
+container(ax, 0.08, 0.08, 1.95, 1.62, "Transacting bank (sender or receiver)")
+container(ax, 2.18, 0.08, 1.95, 1.62, r"Validator committee $N'$ (trust-gated)")
+container(ax, 4.28, 0.08, 1.94, 1.62, "Regulator committee (t-of-n)")
+bank(ax, 1.83, 0.5, 0.9); server(ax, 3.88, 0.52, 0.9); server(ax, 3.96, 0.56, 0.9)
+box(ax, 0.18, 0.34, 1.42, 0.36, "Wallet", [r"$\mathrm{sk}_S,\ \mathrm{pk}_S=\mathrm{sk}_S H$, balance $b$"], lsize=5.9)
+box(ax, 0.18, 0.78, 1.75, 0.5, "Prover (Algorithm 1)", [r"limbs $C_\ell = a_\ell G + r_\ell H$", r"handles $D_S, D_R, D_A$ ($D = r\cdot\mathrm{pk}$)", r"$\pi_{\mathrm{val}},\ \pi_{\mathrm{bal}}$, aggregated $\pi_{\mathrm{rng}}$"], lsize=5.9)
+box(ax, 0.18, 1.34, 1.75, 0.3, "Receiver decryption", [r"$a_\ell G = C_\ell - \mathrm{sk}_R^{-1}D_R$, BSGS"], tsize=6.3, lsize=5.7)
+box(ax, 2.28, 0.34, 1.42, 0.42, "Verifier (Algorithm 2)", ["signature, nonce, state", r"$\pi_{\mathrm{val}},\ \pi_{\mathrm{bal}},\ \pi_{\mathrm{rng}}$"], lsize=5.9)
+box(ax, 2.28, 0.84, 0.86, 0.3, "Tx pool", None, tsize=6.3)
+box(ax, 3.22, 0.84, 0.81, 0.3, "Canary", None, tsize=6.3, ls="--")
+box(ax, 2.28, 1.22, 1.75, 0.42, "BFT replica (Algorithm 3)", ["PRE-PREPARE / PREPARE / COMMIT", r"quorum $2f+1$ over $N'$"], lsize=5.9)
+box(ax, 4.38, 0.34, 1.74, 0.5, "Key-share holders", [r"$w_i = f(i)$,  $W_i = w_i H$", r"$S_i = w_i D_A$ + DLEQ proof"], lsize=5.9)
+keyicon(ax, 5.95, 0.47, 1.0)
+box(ax, 4.38, 0.98, 1.2, 0.66, "Requester", ["signs request q", "verifies DLEQ,", "combines t shares", "(Algorithm 4)"], lsize=5.7)
+person(ax, 5.86, 1.28, 1.15)
+# ---------- row B: ledger ----------
+container(ax, 0.08, 1.98, 6.14, 1.12, "Permissioned ledger (replicated at every validator)")
+blocks(ax, 0.2, 2.36, n=4, w=0.19, h=0.17, gap=0.06)
+text(ax, 0.68, 2.68, "Hash-chained blocks", size=5.8)
+text(ax, 0.68, 2.82, "(Merkle root over records)", size=5.4)
+tx0, ty0 = 1.3, 2.28; cw = [0.44, 0.62, 0.62, 0.38]; rh = 0.16
+heads = ["Account", "Available", "Pending", "Nonce"]; rows = [["Bank A", "(C, D)", "(C, D)", "17"], ["Bank B", "(C, D)", "(C, D)", "9"], ["…", "…", "…", "…"]]
+xx = tx0
+for j, wdt in enumerate(cw):
+    rect(ax, xx, ty0, wdt, rh, fc=G2, lw=0.5, z=3); text(ax, xx + wdt / 2, ty0 + rh / 2, heads[j], size=5.6, weight="bold")
+    for i, r in enumerate(rows):
+        rect(ax, xx, ty0 + rh * (i + 1), wdt, rh, fc="white", lw=0.5, z=3); text(ax, xx + wdt / 2, ty0 + rh * (i + 1.5), r[j], size=5.6)
+    xx += wdt
+text(ax, tx0 + sum(cw) / 2, ty0 + rh * 4 + 0.1, "Encrypted account state (twisted ElGamal)", size=5.6, style="italic")
+box(ax, 3.62, 2.28, 0.82, 0.62, "Settlement", ["contract,", "3 execution", "modes"], tsize=6.2, lsize=5.6)
+box(ax, 4.52, 2.28, 0.78, 0.62, "Trust", ["registry", r"$\tau_n$, $N'$,", "quarantine"], tsize=6.2, lsize=5.6)
+box(ax, 5.38, 2.28, 0.76, 0.62, "Audit", ["contract", "request log,", "deadlines"], tsize=6.2, lsize=5.6)
+# ---------- row C: trust engine ----------
+container(ax, 0.08, 3.36, 6.14, 0.86, "Trust engine (deterministic, re-executed by every validator)")
+box(ax, 0.18, 3.63, 2.2, 0.52, "Evidence verifier", ["E1 equivocation, E2 invalid or canary vote,", "E3 unlogged share, E4 missed deadline,", "E5 invalid accusation"], tsize=6.2, lsize=5.4)
+box(ax, 2.62, 3.63, 1.55, 0.52, "Score update (Algorithm 5)", [r"$\tau \leftarrow \alpha\tau + (1-\alpha)s$", "proven evidence: quarantine"], tsize=6.2, lsize=5.6)
+box(ax, 4.4, 3.63, 1.74, 0.52, "Eligibility", [r"$N' = \{n : \tau_n \geq \theta$,", "not quarantined}"], tsize=6.2, lsize=5.6)
+arrow(ax, [(2.38, 3.89), (2.62, 3.89)]); arrow(ax, [(4.17, 3.89), (4.4, 3.89)])
+# ---------- connectors ----------
+arrow(ax, [(1.93, 1.03), (2.1, 1.03), (2.1, 0.55), (2.28, 0.55)])
+label(ax, 2.105, 0.8, "(1) Tx", size=5.6, bg=G1)
+arrow(ax, [(2.71, 0.76), (2.71, 0.84)])
+arrow(ax, [(3.22, 0.99), (3.14, 0.99)], ls=(0, (2, 1)))
+arrow(ax, [(2.71, 1.14), (2.71, 1.22)])
+arrow(ax, [(2.62, 1.64), (2.62, 2.28)])
+label(ax, 2.62, 1.86, "(2) commit, apply", size=5.6, bg=G1)
+arrow(ax, [(1.6, 2.28), (1.6, 1.64)])
+label(ax, 1.6, 1.86, r"(3) credit $(C, D_R)$", size=5.6, bg=G1)
+arrow(ax, [(5.46, 1.64), (5.46, 2.28)])
+label(ax, 5.46, 1.8, "(4) request q", size=5.6, bg=G1)
+arrow(ax, [(5.95, 2.28), (5.95, 0.84)])
+label(ax, 5.95, 1.92, "(5) ReqLogged", size=5.6, bg=G1)
+arrow(ax, [(4.9, 0.84), (4.9, 0.98)])
+label(ax, 5.05, 0.91, "(6) shares", size=5.2, bg=None, ha="left")
+arrow(ax, [(1.0, 2.9), (1.0, 3.63)])
+label(ax, 1.0, 3.2, "votes, evidence (on-chain)", size=5.6, bg="white")
+arrow(ax, [(4.91, 3.63), (4.91, 2.9)])
+label(ax, 4.91, 3.2, r"$\tau_n$, $N'$", size=5.6, bg="white")
+arrow(ax, [(4.75, 2.28), (4.75, 2.12), (4.2, 2.12), (4.2, 1.43), (4.03, 1.43)], ls=(0, (3, 1.5)))
+label(ax, 4.2, 1.85, "eligibility", size=5.4, bg=G1, style="italic")
+save(fig, "fig1_architecture")
